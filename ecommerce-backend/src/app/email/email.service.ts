@@ -75,4 +75,100 @@ export class EmailService {
       return false;
     }
   }
+
+  async sendVerificationEmail(
+    to: string,
+    name: string,
+    url: string,
+  ): Promise<boolean> {
+    const subject = 'Xác thực email';
+    // TODO: Split html to another file
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Xác thực email</h2>
+        <p>Xin chào ${name},</p>
+        <p>Cảm ơn bạn đã đăng ký tài khoản! Vui lòng xác thực email để hoàn tất quá trình đăng ký.</p>
+
+        <div style="background-color: #f4f4f4; padding: 20px; margin: 20px 0; border-radius: 5px; text-align: center;">
+          <a href="${url}"
+            style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Xác thực email
+          </a>
+        </div>
+
+        <p>Nếu bạn không tạo tài khoản này, vui lòng bỏ qua email này.</p>
+
+        <p>Trân trọng,<br>Đội ngũ Ecommerce Store</p>
+      </div>`;
+
+    return this.sendEmail({
+      to,
+      subject,
+      html,
+    });
+  }
+
+  async sendPasswordResetEmail(
+    to: string,
+    name: string,
+    url: string,
+  ): Promise<boolean> {
+    const subject = 'Đặt lại mật khẩu';
+    // TODO: Split html to another file
+    const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Đặt lại mật khẩu</h2>
+
+      <p>Xin chào ${name},</p>
+
+      <p>
+        Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
+      </p>
+
+      <div
+        style="
+          background-color: #f4f4f4;
+          padding: 20px;
+          margin: 20px 0;
+          border-radius: 5px;
+          text-align: center;
+        "
+      >
+        <a
+          href="${url}"
+          style="
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+          "
+        >
+          Đặt lại mật khẩu
+        </a>
+      </div>
+
+      <p>
+        Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
+      </p>
+
+      <p>
+        <strong>Lưu ý:</strong> Link này sẽ hết hạn sau 1 giờ.
+      </p>
+
+      <p>
+        Trân trọng,<br />
+        Đội ngũ Ecommerce Store
+      </p>
+    </div>
+  `;
+
+    return this.sendEmail({
+      to,
+      subject,
+      html,
+    });
+  }
 }
