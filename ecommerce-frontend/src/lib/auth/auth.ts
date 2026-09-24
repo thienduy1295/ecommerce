@@ -3,6 +3,18 @@ import { bearer } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { Pool } from "pg";
 import { v7 as uuidv7 } from "uuid";
+import { sendPasswordResetEmail, sendVerificationEmail } from "./send-auth-email";
+
+function getAppUrl(): string {
+  const raw =
+    process.env.BETTER_AUTH_APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000";
+
+  return raw.replace(/\/+$/, "");
+}
+
+const appUrl = getAppUrl();
 
 const pool = new Pool({
   host: process.env.DB_HOST || "localhost",
@@ -21,6 +33,19 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, token }) => {
+      const resetPasswordUrl = `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+      await sendPasswordResetEmail(user.email, user.name, resetPasswordUrl);
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: false,
+    expiresIn: 24 * 60 * 60,
+    sendVerificationEmail: async ({ user, token }) => {
+      const verifyUrl = `${appUrl}/auth/verify-email?token=${encodeURIComponent(token)}$email=${encodeURIComponent(user.email)}`;
+      await sendVerificationEmail(user.email, user.name, verifyUrl);
+    },
   },
   secret: process.env.BETTER_AUTH_SECRET || "",
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
